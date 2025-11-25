@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <div th:replace="~{fragment :: meta}"></div>   
+        <div th:replace="~{fragment :: styles}"></div>
+        <title>会社概要</title>	
+    </head>
+    <body>
+        <div class="tabelogpage-wrapper">
+            <div th:replace="~{fragment :: header}"></div>
+            
+            <main>
+                <div class="container pt-4 pb-5 tabelogpage-container company-page">
+                    <h2 class="mb-4">会社概要</h2>
+                    
+                    <div class="bg-white p-4 shadow-sm rounded">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 30%;">会社名</th>
+                                    <td th:text="${company.companyName}">NAGOYAMESHI株式会社</td> 
+                                </tr>
+                                <tr>
+                                    <th>代表者名</th>
+                                    <td th:text="${company.representativeName}">代表取締役 北村 美桜</td>
+                                </tr>
+                                <tr>
+                                    <th>設立日</th>
+                                    <td th:text="${company.establishmentDate}">2010年4月1日</td>
+                                </tr>
+                                <tr>
+                                    <th>所在地</th>
+                                    <td th:text="${company.address}">愛知県名古屋市中村区1-1-1 NAGOYAMESHI TOWER 1101</td>
+                                </tr>
+                                <tr>
+                                    <th>事業内容</th>
+                                    <td th:text="${company.businessDetails}">飲食店の情報提供サービス事業</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+            
+            <div th:replace="~{fragment :: footer}"></div>
+        </div>    
+        
+        <div th:replace="~{fragment :: scripts}"></div>  
+	</body>
+</html>
