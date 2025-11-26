@@ -1,4 +1,4 @@
-package com.example.tabelogpage.security;
+package com.example.tabelogpage.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.tabelogpage.entity.User;
 import com.example.tabelogpage.repository.UserRepository;
+import com.example.tabelogpage.security.UserDetailsImpl;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

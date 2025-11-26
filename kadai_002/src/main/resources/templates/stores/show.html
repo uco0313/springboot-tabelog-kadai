@@ -25,8 +25,8 @@
                                </ol>
                            </nav> 
                            
-                           <!-- お気に入りセクション -->
-                                <div sec:authorize="isAuthenticated()">
+                           <!-- 1. お気に入りセクション: 有料会員 (ROLE_PAID) のみ表示 -->
+                                <div sec:authorize="hasRole('ROLE_PAID')">
                                     <div th:if="${isFavorite}">
                                         <a href="#" onclick="event.preventDefault(); document.getElementById('favorite-form').submit();">&#9829; お気に入り解除</a>
                                         <form method="post" th:action="@{/stores/__${store.id}__/favorites/__${favorite.id}__/delete}" id="favorite-form" class="d-none"></form>                                        
@@ -146,16 +146,20 @@
                                        
                                    </div>
                                    
+                                   <!-- 予約セクションの表示制御 -->
+                                   <!-- 1. 未ログインの場合: 「予約するにはログインが必要です。」 -->
                                    <div sec:authorize="isAnonymous()" class="col-lg-4 px-0 ps-lg-4 mb-4">                  
                                        <div class="card">
                                            <div class="card-body">                                                                                                                                                                                                                     
-                                               <p class="card-text">予約するには<a th:href="@{/login}">ログイン</a>が必要です。</p>                                                                                                                                            
+                                               <p class="card-text">予約は<a th:href="@{/login}">有料会員ログイン</a>が必要です。</p>                                                                                                                                            
                                                <button type="submit" class="btn text-white shadow-sm w-100 tabelogpage-btn" disabled>予約する</button>                                                                                                                
                                            </div>
                                        </div>  
                                    </div>     
                                    
-                                   <div sec:authorize="isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">                  
+                                   <!-- 2. 有料会員 (ROLE_PAID) の場合: 予約フォームを表示 -->
+                                   <!-- ログイン済みだが無料会員の場合は何も表示されない -->
+                                   <div sec:authorize="hasRole('ROLE_PAID')" class="col-lg-4 px-0 ps-lg-4 mb-4">                  
                                        <div class="card">
                                            <div class="card-body">
                                                <form method="post" th:action="@{/stores/__${store.id}__/reservations/input}" th:object="${reservationInputForm}">
@@ -185,17 +189,21 @@
                                                    
                                                    <button type="submit" class="btn text-white shadow-sm w-100 tabelogpage-btn">予約する</button>                                                                                                                
                                                </form>                                                                                                                
-                               </div>                                                                                             
-                           </div>
-                           
+                                           </div>                                                                                             
+                                       </div>
+                                   </div>
+                                   
                            </div>
                            <div class="container px-0 mt-5">
                                 <h2 class="mb-4 text-center">レビュー</h2>
-                                <div sec:authorize="isAuthenticated()" th:unless="${hasUserAlreadyReviewed}" class="row justify-content-center mb-4">
+                                <!-- レビュー投稿ボタン: 有料会員 (ROLE_PAID) のみ表示 -->
+                                <div sec:authorize="hasRole('ROLE_PAID')" th:unless="${hasUserAlreadyReviewed}" class="row justify-content-center mb-4">
                                     <div class="col-lg-4">
                                         <a th:href="@{/stores/__${store.id}__/reviews/register}" class="btn text-white shadow-sm w-100 tabelogpage-btn">レビューを投稿する</a>
                                     </div>
                                 </div>
+                                
+                                <!-- レビューリスト/「まだレビューがありません」の表示は全ユーザーに公開 -->
                                 <div th:if="${#lists.isEmpty(newReviews)}" class="mb-4">                                    
                                     <p class="text-center">まだレビューがありません。</p>                                    
                                 </div>                                                                 
@@ -208,7 +216,8 @@
                                             <div class="card-body">
                                                 <div class="d-flex justify-content-between">
                                                     <h5 class="card-title" th:text="${review.user.name}"></h5>
-                                                    <span sec:authorize="isAuthenticated()" th:if="${#authentication.principal.user.id == review.user.id}">
+                                                    <!-- レビューの編集・削除ボタンは、投稿者かつ有料会員の場合にのみ表示 -->
+                                                    <span sec:authorize="isAuthenticated() and hasRole('ROLE_PAID')" th:if="${#authentication.principal.user.id == review.user.id}">
                                                         <a th:href="@{/stores/__${store.id}__/reviews/__${review.id}__/edit}" class="me-2">編集</a>
                                                         <a href="#" class="tabelogpage-link-danger" data-bs-toggle="modal" th:data-bs-target="${'#deleteReviewModal' + review.id}">削除</a>
                                                         <div class="modal fade" th:id="${'deleteReviewModal' + review.id}" tabindex="-1" th:aria-labelledby="${'deleteReviewModalLabel' + review.id}">

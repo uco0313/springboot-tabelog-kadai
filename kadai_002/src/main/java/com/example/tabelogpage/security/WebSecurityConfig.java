@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,47 +14,53 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class WebSecurityConfig {
 
+    // Spring Securityが自動的にUserDetailsServiceImplをBeanから取得するためです。
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((requests) -> requests
+                // すべてのユーザーにアクセスを許可するURLを統合して記述
                 .requestMatchers(
-                    "/css/**", "/images/**", "/js/**", "/storage/**", // 静的リソース
-                    "/", "/signup/**", "/stores", "/stores/", "/stores/{id}", "/stores/{storeId}/reviews","/company", 
-                    // パスワードリセット関連の全てのURLを許可
+                    "/css/**", "/images/**", "/js/**", "/storage/**", 
+                    "/", "/signup/**", "/stores", "/stores/", "/stores/{id}", "/stores/{storeId}/reviews","/company","/index", 
                     "/passwordreset", "/passwordreset/**", "/login"
                 ).permitAll()
+                
+                // 有料会員にのみアクセスを許可するURL
+                .requestMatchers("/reservations/confirm", "reservations/index","/reservations/**","favorites/**",
+                		         "reviews/edit","reviews/register"
+                		         ).hasRole("PAID") 
                 
                 // 管理者にのみアクセスを許可するURL
                 .requestMatchers("/admin/**", "/admin/stores/export/csv").hasRole("ADMIN")
                 
-                // 上記以外のURLはログインが必要（会員または管理者のどちらでもOK）
+                // 上記以外のURLはログインが必要
                 .anyRequest().authenticated()
             )
             
-            // セッション管理の設定を追加し、リダイレクト時のURLパラメータ消失を防ぎます
-            .sessionManagement((session) -> session
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+            .formLogin((form) -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/?loggedIn")
+                .failureUrl("/login?error")
+                .permitAll()
             )
             
-            .formLogin((form) -> form
-                .loginPage("/login")      // ログインページのURL
-                .loginProcessingUrl("/login")    // ログインフォームの送信先URL
-                .defaultSuccessUrl("/?loggedIn") // ログイン成功時のリダイレクト先URL
-                .failureUrl("/login?error")      // ログイン失敗時のリダイレクト先URL
+            .logout((logout) -> logout
+                .logoutSuccessUrl("/?loggedOut")
                 .permitAll()
             )
-            .logout((logout) -> logout
-                .logoutSuccessUrl("/?loggedOut") // ログアウト時のリダイレクト先URL
-                .permitAll()
-            );
-
+            
+            // CSRF除外設定を最後に記述
+            .csrf((csrf) -> csrf.ignoringRequestMatchers("/stripe/webhook"));
+            		
+            
         return http.build();
     }
     
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-    
+    }    
 }
