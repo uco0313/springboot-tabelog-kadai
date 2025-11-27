@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS stores (
     address VARCHAR(255) NOT NULL COMMENT '住所',
     phone_number VARCHAR(50) NOT NULL COMMENT '電話番号',
     regular_holiday VARCHAR(50) NOT NULL COMMENT '定休日',
-    capacity INT NOT NULL COMMENT '収容人数',
+    capacity INT NOT NULL COMMENT '定員',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登録日',
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日',
     FOREIGN KEY (category_id) REFERENCES categories (id)

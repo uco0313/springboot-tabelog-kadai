@@ -44,6 +44,12 @@ public class StoreEditForm {
     @Min(value = 0, message = "価格帯は0円以上に設定してください。")
     private Integer priceMax;
     
+    // 定員 
+    @NotNull(message = "定員を入力してください。")
+    @Min(value = 1, message = "定員は1名以上に設定してください。")
+    private Integer capacity;
+  
+    
     // 営業時間(開店) 
     @Pattern(regexp = "^([01]?[0-9]|2[0-3]):[0-5][0-9]$", message = "開店時間をHH:MM形式で入力してください。")
     @NotNull(message = "開店時間を入力してください。") 

@@ -16,6 +16,23 @@
                     <div th:if="${param.loggedOut}" class="alert alert-info">ログアウトしました。</div>
                     <div th:if="${successMessage}" class="alert alert-info"><span th:text="${successMessage}"></span></div>                     
                     
+                    <div class="mb-5">
+                        <h3 class="text-center mb-3">カテゴリから探す</h3>
+                        
+                        <div class="row justify-content-center">
+                            <div class="col-sm-6 col-md-5 col-lg-5"> 
+                                <form th:action="@{/stores}" method="get" class="d-flex">
+                                    <select name="categoryId" class="form-select me-2"> <option value="">全てのカテゴリ</option>
+                                        <option th:each="category : ${categoryList}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.name}">カテゴリ名</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-link p-0 border-0"> <img th:src="@{/images/search.png}" alt="検索" style="width: 40px; height: 40px; border-radius: 5px;">
+   								 </button>
+                                </form>
+                            </div>
+                        </div>
+                        </div>
                     <h2 class="text-center mb-3">NEW STORES</h2>
                     <div class="row row-cols-lg-5 row-cols-2 g-3 mb-5">
                         

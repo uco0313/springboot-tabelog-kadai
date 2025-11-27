@@ -349,15 +349,15 @@ INSERT IGNORE INTO roles (id, name) VALUES (3, 'ROLE_ADMIN');     -- 管理者
 -- 7. users テーブル
 -- #################################
 
--- ID 1: 佐藤 太郎 (ROLE_GENERAL) - レビューデータで使用
+-- ID 1: 佐藤 太郎 
 INSERT IGNORE INTO users (id, name, furigana, postal_code, address, phone_number, email, password, role_id, enabled) 
 VALUES (1, '佐藤 太郎', 'サトウ タロウ', '460-0003', '愛知県名古屋市中区錦1-1-1', '090-1234-5678', 'taro.sato@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 2, true);
 
--- ID 2: 鈴木 花子 (ROLE_ADMIN) - レビューと予約データで使用
+-- ID 2: 鈴木 花子 
 INSERT IGNORE INTO users (id, name, furigana, postal_code, address, phone_number, email, password, role_id, enabled) 
 VALUES (2, '鈴木 花子', 'スズキ ハナコ', '450-0002', '愛知県名古屋市中村区名駅4-27-1', '090-1234-5678', 'hanako.suzuki@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 1, true);
 
--- ID 3: 高橋 義勝 (ROLE_GENERAL) - 予約データで使用
+-- ID 3: 高橋 義勝 
 INSERT IGNORE INTO users (id, name, furigana, postal_code, address, phone_number, email, password, role_id, enabled) 
 VALUES (3, '高橋 義勝', 'タカハシ ヨシカツ', '444-0044', '愛知県岡崎市康生通西4-71', '090-1234-5678', 'yoshikatsu.takahashi@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 2,true);
 

@@ -104,6 +104,47 @@ public class ReservationService {
         return true; // 定休日と一致しなかったので予約可能
     }
     
+    // =========================================================
+    // ★★★ 定員チェックのためのメソッドを追加 ★★★
+    // =========================================================
+    
+    /**
+     * 指定された日時・店舗における、他の予約の合計人数を取得します。
+     * * @param store 対象店舗
+     * @param dateTime 予約日時
+     * @return 既存の予約の合計人数 (予約がない場合は 0 を返す)
+     */
+    public int getReservedPeople(Store store, LocalDateTime dateTime) {
+        // ReservationRepositoryに定義されたメソッドを使用して合計人数を取得
+        // sumNumberOfPeopleByStoreAndReservationDate(Store store, LocalDateTime reservationDate) が必要
+        Integer reservedPeople = reservationRepository.sumNumberOfPeopleByStoreAndReservationDate(store, dateTime);
+        
+        // 結果が null の場合は 0 を返します (予約がまだない場合)
+        return reservedPeople != null ? reservedPeople : 0;
+    }
+
+    /**
+     * 予約人数が店舗の定員を超えていないかをチェックします。
+     * * @param store 対象店舗
+     * @param reservationDateTime 予約日時
+     * @param numberOfPeople 今回の予約人数
+     * @return 定員に空きがあれば true、定員オーバーなら false
+     */
+    public boolean isCapacitySufficient(Store store, LocalDateTime reservationDateTime, int numberOfPeople) {
+        // 1. 店舗の定員を取得
+        int storeCapacity = store.getCapacity();
+
+        // 2. 既存の予約の合計人数を取得
+        int reservedPeople = getReservedPeople(store, reservationDateTime);
+
+        // 3. 今回の予約人数と既存の合計人数を合わせても定員を超えないかチェック
+        int totalPeople = reservedPeople + numberOfPeople;
+        
+        return totalPeople <= storeCapacity;
+    }
+
+    // =========================================================
+    
     /**
      * 予約データを登録します。
      * @param reservationRegisterForm 登録フォーム

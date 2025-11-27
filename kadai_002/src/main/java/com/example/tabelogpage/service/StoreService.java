@@ -43,7 +43,7 @@ public class StoreService {
         return categoryRepository.findAll();
     }
     
-   
+    
      //検索条件に基づいて店舗を検索します。
     
     public Page<Store> findByCriteria(String keyword, String area, Integer priceMin, Integer priceMax, Integer categoryId, Pageable pageable) {
@@ -133,10 +133,10 @@ public class StoreService {
     public void create(StoreRegisterForm storeRegisterForm) { 
         Store store = new Store();
         
-   
+    
         Category category = categoryRepository.getReferenceById(storeRegisterForm.getCategoryId());
         store.setCategory(category); 
-       
+        
         
         MultipartFile imageFile = storeRegisterForm.getImageFile();
         
@@ -155,7 +155,7 @@ public class StoreService {
         store.setPriceMin(storeRegisterForm.getPriceMin());
         store.setPriceMax(storeRegisterForm.getPriceMax());
         
-   
+    
         store.setOpeningTime(LocalTime.parse(storeRegisterForm.getOpeningTime()));
         store.setClosingTime(LocalTime.parse(storeRegisterForm.getClosingTime()));
         
@@ -164,7 +164,9 @@ public class StoreService {
         store.setPhoneNumber(storeRegisterForm.getPhoneNumber());
         
         store.setRegularHoliday(storeRegisterForm.getRegularHoliday());
-                                
+        
+        store.setCapacity(storeRegisterForm.getCapacity());
+                                        
         storeRepository.save(store);
     } 
     
@@ -186,17 +188,20 @@ public class StoreService {
         store.setDescription(storeEditForm.getDescription());
         store.setPriceMin(storeEditForm.getPriceMin());
         store.setPriceMax(storeEditForm.getPriceMax());
+        
+     
+        store.setCapacity(storeEditForm.getCapacity());
 
         Category category = categoryRepository.getReferenceById(storeEditForm.getCategoryId());
         store.setCategory(category); 
 
-        store.setOpeningTime(LocalTime.parse(storeEditForm.getOpeningTime())); 
-        store.setClosingTime(LocalTime.parse(storeEditForm.getClosingTime())); 
+        store.setOpeningTime(LocalTime.parse(storeEditForm.getOpeningTime()));    
+        store.setClosingTime(LocalTime.parse(storeEditForm.getClosingTime()));    
         store.setPostalCode(storeEditForm.getPostalCode());
         store.setAddress(storeEditForm.getAddress());
         store.setPhoneNumber(storeEditForm.getPhoneNumber());
-        store.setRegularHoliday(storeEditForm.getRegularHoliday()); 
-                    
+        store.setRegularHoliday(storeEditForm.getRegularHoliday());    
+                            
         storeRepository.save(store);
     }    
     
@@ -214,12 +219,12 @@ public class StoreService {
     } 
     
     
-    public void copyImageFile(MultipartFile imageFile, Path filePath) {           
+    public void copyImageFile(MultipartFile imageFile, Path filePath) {             
         try {
             Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING); 
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("ファイルのコピー中にエラーが発生しました。", e);
-        }         
+        }          
     } 
 }

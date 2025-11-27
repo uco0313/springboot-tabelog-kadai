@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <div th:replace="~{fragment :: meta}"></div>   
+        <div th:replace="~{fragment :: styles}"></div>
+        <title th:text="${category != null} ? 'カテゴリ編集' : 'カテゴリ新規登録'"></title>	
+    </head>
+    <body>
+        <div class="tabelogpage-wrapper">
+            <div th:replace="~{fragment :: header}"></div>
+            
+            <main>
+                <div class="container pt-4 pb-5 tabelogpage-container">
+                    
+                    <h2 class="mb-4" th:text="${category != null} ? 'カテゴリ編集' : 'カテゴリ新規登録'">カテゴリ編集</h2>
+                    
+                    <div class="row">
+                        <div class="col-xl-6 col-lg-8 col-md-10 mx-auto">
+                            <form method="post" 
+                                  th:action="@{/admin/categories/} + (${category} ? ${category.id} : 'create') + (${category} ? '/update' : '')" 
+                                  th:object="${categoryRegisterForm}"> 
+                                  
+                                <div class="mb-3">
+                                    <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                                        <ul class="mb-0">
+                                            <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="name" class="form-label text-md-start fw-bold">カテゴリ名</label>
+                                    <input type="text" class="form-control" th:field="*{name}" required>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary shadow-sm w-25" th:text="${category != null} ? '更新' : '登録'">登録</button>
+                                </div>
+                            </form>
+                            
+                            <div class="mt-4">
+                                <a th:href="@{/admin/categories}">一覧に戻る</a>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </main>
+            
+            <div th:replace="~{fragment :: footer}"></div>
+        </div>    
+        
+        <div th:replace="~{fragment :: scripts}"></div>  
+	</body>
+</html>

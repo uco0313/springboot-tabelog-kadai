@@ -24,7 +24,7 @@ public class WebSecurityConfig {
                 .requestMatchers(
                     "/css/**", "/images/**", "/js/**", "/storage/**", 
                     "/", "/signup/**", "/stores", "/stores/", "/stores/{id}", "/stores/{storeId}/reviews","/company","/index", 
-                    "/passwordreset", "/passwordreset/**", "/login"
+                    "/passwordreset", "/passwordreset/**", "/login","/categories", "/search"
                 ).permitAll()
                 
                 // 有料会員にのみアクセスを許可するURL

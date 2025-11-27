@@ -65,4 +65,10 @@ public class StoreRegisterForm {
     @NotBlank(message = "定休日を入力してください。")
     private String regularHoliday;
     
+    
+    // 定員
+    @NotNull(message = "定員を入力してください。") // NOT NULL 制約に対応
+    @Min(value = 1, message = "定員は1名以上に設定してください。") // 最小値を1名に設定
+    private Integer capacity;
+    
 }

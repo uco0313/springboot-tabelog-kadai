@@ -255,6 +255,11 @@ footer {
     transition: background-color 0.2s ease-in-out;
 }
 
+.btn-outline-info:hover {
+    /* Bootstrapのデフォルトスタイルが適用され、背景が水色、文字が白になる */
+    color: #ffffff !important; 
+}
+
 @media screen and (min-width: 1400px) {
  .tabelogpage-container {
    max-width: 1200px;

@@ -34,7 +34,7 @@ public class ReservationController {
     private final ReservationService reservationService; 
     
     public ReservationController(ReservationRepository reservationRepository,StoreRepository storeRepository, ReservationService reservationService) {        
-        this.reservationRepository = reservationRepository;      
+        this.reservationRepository = reservationRepository;       
         this.storeRepository = storeRepository;
         this.reservationService = reservationService;
     }    
@@ -57,12 +57,12 @@ public class ReservationController {
         BindingResult bindingResult, 
         RedirectAttributes redirectAttributes,
         Model model
-    ) {    
+    ) {     
         Store store = storeRepository.getReferenceById(id);
         
         // 1. 基本的なエラーをチェック
         if (bindingResult.hasErrors()) {            
-            model.addAttribute("store", store);            
+            model.addAttribute("store", store);          
             return "stores/show"; 
         }
         
@@ -87,39 +87,51 @@ public class ReservationController {
                 bindingResult.rejectValue("reservationDate", "isNotRegularHoliday", store.getRegularHoliday() + "は定休日です。");
             }
             
-
+            
         } catch (Exception e) {
             bindingResult.rejectValue("reservationDate", "typeMismatch", "予約日時の形式が正しくありません。");
         }
         
-        // 3. 業務ロジックのチェックでエラーがあれば、店舗詳細画面に戻る
+        // 3. 業務ロジックのチェック（過去日時、営業時間、定休日）でエラーがあれば、店舗詳細画面に戻る
         if (bindingResult.hasErrors()) {            
-            model.addAttribute("store", store);            
+            model.addAttribute("store", store);          
             return "stores/show"; 
         }
         
-        // ⭐ 追加: 定員チェック
-        Integer requestedPeople = reservationInputForm.getNumberOfPeople();
-        Integer capacity = store.getCapacity();
-        
-        if (requestedPeople > capacity) {
-            // 定員オーバーエラーを追加
-            bindingResult.rejectValue("numberOfPeople", "capacityViolation", 
-                                      "予約人数が店舗の定員(" + capacity + "名)を超えています。");
+        // =========================================================
+        // ★★★ 追加: 定員チェック (既存の予約人数との合計をチェック) ★★★
+        // =========================================================
+        try {
+            // 定員チェック用に日時を再度変換 (tryブロックを分けることで、上で日時形式エラーが捕捉されていればここには来ない)
+            LocalDateTime reservationDateTimeForCapacity = reservationService.convertToLocalDateTime(
+                reservationInputForm.getReservationDate()
+            );
+            int requestedPeople = reservationInputForm.getNumberOfPeople();
+            
+            // 定員が足りているかチェック (StoreServiceのロジックを使用)
+            if (!reservationService.isCapacitySufficient(store, reservationDateTimeForCapacity, requestedPeople)) {
+                // 定員オーバーエラーを追加
+                bindingResult.rejectValue("numberOfPeople", "capacityViolation", 
+                                        "定員オーバーのため、この人数では予約できません。定員は" + store.getCapacity() + "名です。");
+            }
+        } catch (Exception e) {
+             // 上のtry-catchで処理されるはずだが、念のため
+             bindingResult.rejectValue("reservationDate", "typeMismatch", "予約日時の形式が正しくありません。");
         }
+        // =========================================================
         
-        // ⭐ 再チェック: 定員オーバーエラーがあれば、店舗詳細画面に戻る
+        // 4. 定員オーバーエラーがあれば、店舗詳細画面に戻る (再チェック)
         if (bindingResult.hasErrors()) {            
-            model.addAttribute("store", store);            
+            model.addAttribute("store", store);          
             return "stores/show"; 
         }
         
-        // 4. エラーがなければ、確認画面へリダイレクト
+        // 5. エラーがなければ、確認画面へリダイレクト
         ReservationRegisterForm reservationRegisterForm = new ReservationRegisterForm(
         	id, // storeId
         	null, // userId
         	reservationInputForm.getReservationDate(), // 予約日時
-        	reservationInputForm.getNumberOfPeople()  // 予約人数
+        	reservationInputForm.getNumberOfPeople() // 予約人数
         );
         
         redirectAttributes.addFlashAttribute("reservationRegisterForm", reservationRegisterForm);            
@@ -131,7 +143,7 @@ public class ReservationController {
     public String confirm(
         @PathVariable(name = "id") Integer id,
         @ModelAttribute ReservationRegisterForm reservationRegisterForm, 
-        @AuthenticationPrincipal UserDetailsImpl userDetailsImpl,        
+        @AuthenticationPrincipal UserDetailsImpl userDetailsImpl,         
         Model model
     ) {
     

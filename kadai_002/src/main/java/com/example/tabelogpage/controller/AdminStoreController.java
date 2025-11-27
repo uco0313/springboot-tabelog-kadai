@@ -58,7 +58,6 @@ public class AdminStoreController {
     } 
     
 
-
     
     @GetMapping("/register")
     public String register(Model model) {
@@ -70,23 +69,28 @@ public class AdminStoreController {
     
     @PostMapping("/create")
     public String create(@ModelAttribute @Validated StoreRegisterForm storeRegisterForm, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+  
+        System.out.println("★DEBUG: Capacityの値: " + storeRegisterForm.getCapacity()); 
+        System.out.println("★DEBUG: BindingResultのhasErrors: " + bindingResult.hasErrors()); 
+   
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("categoryList", categoryRepository.findAll());
             return "admin/stores/register";
         }
-       
+        
       // 入力チェック
-       if(storeRegisterForm.getPriceMin() > storeRegisterForm.getPriceMax()) {
-    	    model.addAttribute("categoryList", categoryRepository.findAll());
-    	    model.addAttribute("errorMessage", "価格を適正に入力してください。");
-    	    return "admin/stores/register";
-    	}
-       
+        if(storeRegisterForm.getPriceMin() > storeRegisterForm.getPriceMax()) {
+            model.addAttribute("categoryList", categoryRepository.findAll());
+            model.addAttribute("errorMessage", "価格を適正に入力してください。");
+            return "admin/stores/register";
+        }
+        
         storeService.create(storeRegisterForm);
         redirectAttributes.addFlashAttribute("successMessage", "店舗を登録しました。");    
         
         return "redirect:/admin/stores";
-    }  
+    } 
     
     @GetMapping("/{id}")
     public String show(@PathVariable(name = "id") Integer id, Model model) {
@@ -108,20 +112,21 @@ public class AdminStoreController {
         
         // StoreEditFormの定義に合わせて13個の引数を正しい順番で渡す
         StoreEditForm storeEditForm = new StoreEditForm(
-            store.getId(),                                  // 1. id
-            store.getStoreName(),                           // 2. name
-            store.getCategory().getId(),                    // 3. categoryId
-            null,                                           // 4. imageFile
-            store.getDescription(),                         // 5. description
-            store.getPriceMin(),                            // 6. priceMin
-            store.getPriceMax(),                            // 7. priceMax
-            store.getOpeningTime().format(timeFormatter),   // 8. openingTime (LocalTimeをStringに変換)
-            store.getClosingTime().format(timeFormatter),   // 9. closingTime (LocalTimeをStringに変換)
-            store.getPostalCode(),                          // 10. postalCode
-            store.getAddress(),                             // 11. address
-            store.getPhoneNumber(),                         // 12. phoneNumber
-            store.getRegularHoliday()                       // 13. regularHoliday
-        );
+             store.getId(),                                 // 1. id
+             store.getStoreName(),                          // 2. name
+             store.getCategory().getId(),                   // 3. categoryId
+             null,                                          // 4. imageFile
+             store.getDescription(),                        // 5. description
+             store.getPriceMin(),                           // 6. priceMin
+             store.getPriceMax(),                           // 7. priceMax
+             store.getCapacity(),							// 8. capacity
+             store.getOpeningTime().format(timeFormatter),  // 9. openingTime (LocalTimeをStringに変換)
+             store.getClosingTime().format(timeFormatter),  // 10. closingTime (LocalTimeをStringに変換)
+             store.getPostalCode(),                         // 11. postalCode
+             store.getAddress(),                            // 12. address
+             store.getPhoneNumber(),                        // 13. phoneNumber
+             store.getRegularHoliday()                      // 14. regularHoliday
+         );
         
         model.addAttribute("imagePath", imagePath);        
         model.addAttribute("storeEditForm", storeEditForm); 
@@ -136,7 +141,7 @@ public class AdminStoreController {
         @ModelAttribute @Validated StoreEditForm storeEditForm, 
         BindingResult bindingResult, 
         RedirectAttributes redirectAttributes, 
-        Model model  ) {        
+        Model model  ) {         
       
         if (bindingResult.hasErrors()) {
             // エラー発生時、edit.htmlに戻るために必要なデータをModelに再セット
@@ -151,10 +156,10 @@ public class AdminStoreController {
         redirectAttributes.addFlashAttribute("successMessage", "店舗情報を編集しました。");
         
         return "redirect:/admin/stores";
-         }    
+    }    
     
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {        
+    public String delete(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {         
         storeRepository.deleteById(id);
                 
         redirectAttributes.addFlashAttribute("successMessage", "店舗を削除しました。");

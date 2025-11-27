@@ -27,6 +27,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+        <stripe.version>24.22.0</stripe.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -90,6 +91,12 @@
 			<artifactId>commons-csv</artifactId>
 			<version>1.10.0</version>
 		</dependency>
+
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>${stripe.version}</version>
+        </dependency>
 	</dependencies>
 
 	<build>

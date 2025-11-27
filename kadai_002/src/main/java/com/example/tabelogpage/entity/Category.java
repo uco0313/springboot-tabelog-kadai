@@ -1,6 +1,9 @@
 package com.example.tabelogpage.entity;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,9 +25,13 @@ public class Category {
     @Column(name = "name")
     private String name; // (VARCHAR -> String)
 
+    // ★追加：アノテーション★
+    @CreationTimestamp
     @Column(name = "created_at", insertable = false, updatable = false)
-    private Timestamp createdAt; 
+    private LocalDateTime createdAt; 
 
+    // ★追加：アノテーション★
+    @UpdateTimestamp
     @Column(name = "updated_at", insertable = false, updatable = false)
-    private Timestamp updatedAt; 
+    private LocalDateTime updatedAt; 
 }
