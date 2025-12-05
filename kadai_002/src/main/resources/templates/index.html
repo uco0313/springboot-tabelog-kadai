@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <div th:replace="~{fragment :: meta}"></div>   
+        <div th:replace="~{fragment :: styles}"></div>
+        <title>NAGOYAMESHI</title>	
+    </head>
+    <body>
+        <div class="tabelogpage-wrapper">
+            <div th:replace="~{fragment :: header}"></div>
+            
+            <main>
+                <div class="container pt-4 pb-5 tabelogpage-container">
+                    
+                    <div th:if="${param.loggedIn}" class="alert alert-info">ログインしました。</div>  
+                    <div th:if="${param.loggedOut}" class="alert alert-info">ログアウトしました。</div>
+                    <div th:if="${successMessage}" class="alert alert-info"><span th:text="${successMessage}"></span></div>                     
+                    
+                    <div class="mb-5">
+                        <h3 class="text-center mb-3">カテゴリから探す</h3>
+                        
+                        <div class="row justify-content-center">
+                            <div class="col-sm-6 col-md-5 col-lg-5"> 
+                                <form th:action="@{/stores}" method="get" class="d-flex">
+                                    <select name="categoryId" class="form-select me-2"> <option value="">全てのカテゴリ</option>
+                                        <option th:each="category : ${categoryList}" 
+                                                th:value="${category.id}" 
+                                                th:text="${category.name}">カテゴリ名</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-link p-0 border-0"> <img th:src="@{/images/search.png}" alt="検索" style="width: 40px; height: 40px; border-radius: 5px;">
+   								 </button>
+                                </form>
+                            </div>
+                        </div>
+                        </div>
+                    <h2 class="text-center mb-3">NEW STORES</h2>
+                    <div class="row row-cols-lg-5 row-cols-2 g-3 mb-5">
+                        
+                        <div class="col" th:each="newStore : ${newStores}">
+                            <a th:href="@{/stores/__${newStore.getId()}__}" class="link-dark tabelogpage-card-link">
+                                <div class="card h-100">
+                                    
+                                    <img th:if="${newStore.getImagePath()}" 
+                                         th:src="@{/storage/__${newStore.getImagePath()}__}" 
+                                         class="card-img-top tabelogpage-vertical-card-image" 
+                                         alt="店舗画像">
+                                    <img th:unless="${newStore.getImagePath()}" 
+                                         th:src="@{/images/noImage.png}" 
+                                         class="card-img-top tabelogpage-vertical-card-image" 
+                                         alt="NO IMAGE">
+                                    
+                                    <div class="card-body">
+                                        <p class="card-text mb-1"><small class="text-muted" th:text="${newStore.getCategory().getName()}"></small></p>
+                                        <h3 class="card-title" th:text="${newStore.getStoreName()}"></h3>
+                                        
+                                        <p class="card-text mb-0"><small class="text-muted" th:text="${newStore.getAddress()}"></small></p> 
+                                        
+                                        <div>
+                                            <p class="card-text mb-0"> <small class="text-muted" th:text="${'営業時間：' + newStore.getOpeningTime() + '〜' + newStore.getClosingTime()}"></small></p>
+                                            <p class="card-text mb-0"><small class="text-muted" th:text="${'定休日：' + newStore.getRegularHoliday()}"></small></p>
+                                            <p class="card-text mb-0"><small class="text-muted" th:text="${'予算：' + '¥' + #numbers.formatInteger(newStore.getPriceMin(), 1, 'COMMA') + '〜' + '¥' + #numbers.formatInteger(newStore.getPriceMax(), 1, 'COMMA')}"></small></p>          	   
+                                        </div>
+                                    </div>
+                                </div>    
+                            </a>            
+                        </div>
+                        
+                    </div> </div> </main>
+            
+            <div th:replace="~{fragment :: footer}"></div>
+        </div>    
+        
+        <div th:replace="~{fragment :: scripts}"></div>  
+	</body>
+</html>

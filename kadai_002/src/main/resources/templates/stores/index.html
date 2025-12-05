@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<head>
+		<div th:replace="~{fragment :: meta}"></div>
+
+		<div th:replace="~{fragment :: styles}"></div>
+
+		<title>店舗一覧</title>
+	</head>
+	<body>
+		<div class="tabelogpage-wrapper">
+
+			<div th:replace="~{fragment :: header}"></div>
+
+			<main>
+				<div class="container tabelogpage-container pb-5">
+					<div class="row justify-content-center">
+						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+							<ol class="breadcrumb mb-0">
+								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+								<li class="breadcrumb-item active" aria-current="page">店舗一覧</li>
+							</ol>
+						</nav>
+
+						<div class="col-xl-3 col-lg-4 col-md-12">
+						
+							<form method="get" th:action="@{/stores}" class="w-100 mb-3">
+								<div class="input-group">
+									<input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="店舗名・目的地">
+									<button type="submit" class="btn text-white shadow-sm tabelogpage-btn">検索</button>
+								</div>
+                                <input th:if="${area}" type="hidden" name="area" th:value="${area}">
+                                <input th:if="${priceMin}" type="hidden" name="priceMin" th:value="${priceMin}">
+                                <input th:if="${priceMax}" type="hidden" name="priceMax" th:value="${priceMax}">
+                                <input th:if="${categoryId}" type="hidden" name="categoryId" th:value="${categoryId}">
+                                <input th:if="${order}" type="hidden" name="order" th:value="${order}"> 
+							</form>
+							
+							<div class="card mb-3">
+								<div class="card-header">
+									カテゴリから探す
+								</div>
+								<div class="card-body">
+									<form method="get" th:action="@{/stores}" class="w-100">
+										<div class="form-group mb-3">
+											<select class="form-control form-select" name="categoryId">
+												<option value="" th:selected="${categoryId == null}">すべて</option>
+												<option th:each="category : ${categoryList}" 
+												        th:value="${category.getId()}" 
+												        th:selected="${categoryId != null and category.getId().equals(categoryId)}"
+												        th:text="${category.getName()}"></option>
+											</select>
+										</div>
+                                        <input type="hidden" name="keyword" value=""> <input th:if="${area}" type="hidden" name="area" th:value="${area}">
+                                        <input th:if="${priceMin}" type="hidden" name="priceMin" th:value="${priceMin}">
+                                        <input th:if="${priceMax}" type="hidden" name="priceMax" th:value="${priceMax}">
+                                        <input th:if="${order}" type="hidden" name="order" th:value="${order}"> 
+										<div class="form-group">
+											<button type="submit" class="btn text-white shadow-sm w-100 tabelogpage-btn">検索</button>
+										</div>
+									</form>
+								</div>
+							</div>
+
+							<div class="card mb-3">
+								<div class="card-header">
+									エリアから探す
+								</div>
+								<div class="card-body">
+									<form method="get" th:action="@{/stores}" class="w-100">
+										<div class="form-group mb-3">
+											<select class="form-control form-select" name="area">
+												<option value="" hidden>愛知県（名古屋市）の区を選択</option>
+												<optgroup label="愛知県（名古屋市）">
+													<option value="名古屋市" th:selected="${area == '愛知県'}">名古屋市（すべて）</option>
+													<option value="名古屋市千種区" th:selected="${area == '名古屋市千種区'}">千種区</option>
+													<option value="名古屋市東区" th:selected="${area == '名古屋市東区'}">東区</option>
+													<option value="名古屋市北区" th:selected="${area == '名古屋市北区'}">北区</option>
+													<option value="名古屋市西区" th:selected="${area == '名古屋市西区'}">西区</option>
+													<option value="名古屋市中村区" th:selected="${area == '名古屋市中村区'}">中村区</option>
+													<option value="名古屋市中区" th:selected="${area == '名古屋市中区'}">中区</option>
+													<option value="名古屋市昭和区" th:selected="${area == '名古屋市昭和区'}">昭和区</option>
+													<option value="名古屋市瑞穂区" th:selected="${area == '名古屋市瑞穂区'}">瑞穂区</option>
+													<option value="名古屋市熱田区" th:selected="${area == '名古屋市熱田区'}">熱田区</option>
+													<option value="名古屋市中川区" th:selected="${area == '名古屋市中川区'}">中川区</option>
+													<option value="名古屋市港区" th:selected="${area == '名古屋市港区'}">港区</option>
+													<option value="名古屋市南区" th:selected="${area == '名古屋市南区'}">南区</option>
+													<option value="名古屋市守山区" th:selected="${area == '名古屋市守山区'}">守山区</option>
+													<option value="名古屋市緑区" th:selected="${area == '名古屋市緑区'}">緑区</option>
+													<option value="名古屋市名東区" th:selected="${area == '名古屋市名東区'}">名東区</option>
+													<option value="名古屋市天白区" th:selected="${area == '名古屋市天白区'}">天白区</option>
+												</optgroup>
+											</select>
+										</div>
+                                        <input type="hidden" name="keyword" value=""> <input th:if="${priceMin}" type="hidden" name="priceMin" th:value="${priceMin}">
+                                        <input th:if="${priceMax}" type="hidden" name="priceMax" th:value="${priceMax}">
+                                        <input th:if="${categoryId}" type="hidden" name="categoryId" th:value="${categoryId}">
+                                        <input th:if="${order}" type="hidden" name="order" th:value="${order}"> 
+										<div class="form-group">
+											<button type="submit" class="btn text-white shadow-sm w-100 tabelogpage-btn">検索</button>
+										</div>
+									</form>
+								</div>
+							</div>
+
+							<div class="card mb-3">
+								<div class="card-header">
+									予算（価格帯）から探す
+								</div>
+								<div class="card-body">
+									<form method="get" th:action="@{/stores}" class="w-100">
+										<div class="form-group mb-3">
+											<div class="input-group">
+												<input type="number" class="form-control" name="priceMin" th:value="${priceMin}" placeholder="最小金額" min="0" step="1">
+												<span class="input-group-text">〜</span>
+												<input type="number" class="form-control" name="priceMax" th:value="${priceMax}" placeholder="最大金額" min="0" step="1">
+											</div>
+										</div>
+                                        <input type="hidden" name="keyword" value=""> <input th:if="${area}" type="hidden" name="area" th:value="${area}">
+                                        <input th:if="${categoryId}" type="hidden" name="categoryId" th:value="${categoryId}">
+                                        <input th:if="${order}" type="hidden" name="order" th:value="${order}"> 
+										<div class="form-group">
+											<button type="submit" class="btn text-white shadow-sm w-100 tabelogpage-btn">検索</button>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+
+						<div class="col">
+							<div class="d-flex justify-content-between flex-wrap">
+								<p th:if="${storePage.getTotalPages() > 1}" class="fs-5 mb-3" th:text="${'検索結果：' + storePage.getTotalElements() + '件' + '（' + (storePage.getNumber() + 1) + ' / ' + storePage.getTotalPages() + ' ページ）'}"></p>
+								<p th:unless="${storePage.getTotalPages() > 1}" class="fs-5 mb-3" th:text="${'検索結果：' + storePage.getTotalElements() + '件'}"></p>
+							
+							<form method="get" th:action="@{/stores}" class="mb-3 tabelogpage-sort-box"> 
+                                    <input th:if="${keyword}" type="hidden" name="keyword" th:value="${keyword}">
+                                    <input th:if="${area}" type="hidden" name="area" th:value="${area}">
+                                    <input th:if="${priceMin}" type="hidden" name="priceMin" th:value="${priceMin}">  
+                                    <input th:if="${priceMax}" type="hidden" name="priceMax" th:value="${priceMax}">
+                                    <input th:if="${categoryId}" type="hidden" name="categoryId" th:value="${categoryId}">                                           
+                                    <select class="form-select form-select-sm" name="order" onChange="this.form.submit();">                                           
+                                        <option value="priceAsc" th:selected="${order == 'priceAsc'}">予算が安い順</option>
+                                        <option value="priceDesc" th:selected="${order == 'priceDesc'}">予算が高い順</option>
+                                    </select>   
+                                </form>      							
+							</div>
+
+							
+
+							<div class="mb-3" th:each="store : ${storePage}">
+								<a th:href="@{/stores/__${store.getId()}__}" class="link-dark tabelog-card-link">
+									<div class="card h-100">
+										<div class="row g-0">
+											<div class="col-md-4">
+												<img th:if="${store.imagePath}" th:src="@{/storage/__${store.imagePath}__}" class="card-img-top tabelog-horizontal-card-image" alt="店舗画像">
+
+												<img th:unless="${store.imagePath}" th:src="@{/images/noImage.png}" class="card-img-top tabelog-horizontal-card-image" alt="NO IMAGE">
+											</div>
+											<div class="col-md-8">
+												<div class="card-body">
+													
+													<p class="card-text mb-1"><small class="text-muted" th:text="${store.getCategory().getName()}"></small></p>
+
+													<h3 class="card-title mb-3" th:text="${store.getStoreName()}"></h3>
+													<hr class="mb-3">
+													<p class="card-text mb-2">
+														<span th:text="${store.getDescription()}"></span>
+													</p>
+													<p class="card-text mb-2 d-flexjustify-content-between"> <small class="text-muted me-4" th:text="${'〒' + store.getPostalCode() + ' ' + store.getAddress()}"></small>
+													    <small class="text-muted" th:text="${'TEL ' + store.getPhoneNumber()}"></small>
+													</p>
+													
+													<div class="d-flex justify-content-between">
+												    <p class="card-text">
+												        <small class="text-muted" th:text="${'営業時間：' + store.getOpeningTime() + '〜' + store.getClosingTime()}"></small>
+												    </p>
+												    <p class="card-text">
+												        <small class="text-muted" th:text="${'定休日：' + store.getRegularHoliday()}"></small>
+												    </p>
+												    <p class="card-text">
+												        <small class="text-muted" th:text="${'定員：' + store.getCapacity()+ ' 名' }"></small>
+												    </p>
+												    <p class="card-text">
+												        <small class="text-muted" th:text="${'予算：' + '¥' + #numbers.formatInteger(store.getPriceMin(), 1, 'COMMA') + '〜' + '¥' + #numbers.formatInteger(store.getPriceMax(), 1, 'COMMA')}"></small>
+												    </p>
+												</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</a>
+							</div>
+
+							<div th:if="${storePage.getTotalPages() > 1}" class="d-flex justify-content-center">
+								<nav aria-label="店舗一覧ページ">
+									<ul class="pagination">
+										<li class="page-item">
+											<a th:if="${storePage.isFirst()}" class="page-link tabelogpage-page-link disabled">前</a>
+											<a th:unless="${storePage.isFirst()}" th:href="@{/stores(page = ${storePage.getNumber() - 1}, keyword = ${keyword}, area = ${area}, priceMin = ${priceMin}, priceMax = ${priceMax}, categoryId = ${categoryId}, order = ${order})}" class="page-link tabelog-page-link">前</a>
+										</li>
+										<li th:each="i : ${#numbers.sequence(0, storePage.getTotalPages() - 1)}" th:class="${i == storePage.getNumber() ? 'page-item active' : 'page-item'}">
+											<a th:href="@{/stores(page = ${i}, keyword = ${keyword}, area = ${area}, priceMin = ${priceMin}, priceMax = ${priceMax}, categoryId = ${categoryId}, order = ${order})}" class="page-link tabelogpage-page-link" th:text="${i + 1}"></a>
+										</li>
+										<li class="page-item">
+											<a th:if="${storePage.isLast()}" class="page-link tabelogpage-page-link disabled">次</a>
+											<a th:unless="${storePage.isLast()}" th:href="@{/stores(page = ${storePage.getNumber() + 1}, keyword = ${keyword}, area = ${area}, priceMin = ${priceMin}, priceMax = ${priceMax}, categoryId = ${categoryId}, order = ${order})}" class="page-link tabelog-page-link">次</a>
+										</li>
+									</ul>
+								</nav>
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+
+			<div th:replace="~{fragment :: footer}"></div>
+		  </div>
+		<div th:replace="~{fragment :: scripts}"></div>
+	</body>
+</html>

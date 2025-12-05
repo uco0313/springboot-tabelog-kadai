@@ -1,0 +1,147 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 依存関係が深いテーブルから順に削除（TRUNCATEではなくDROPを使用）
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS reservations;
+DROP TABLE IF EXISTS stores;
+DROP TABLE IF EXISTS password_reset_tokens;
+DROP TABLE IF EXISTS verification_tokens;
+DROP TABLE IF EXISTS users;
+-- usersが参照しているため、rolesは後に削除
+DROP TABLE IF EXISTS roles; 
+DROP TABLE IF EXISTS categories;
+DROP TABLE IF EXISTS companies;
+
+
+SET FOREIGN_KEY_CHECKS = 1;
+-- 1. 参照先の親テーブル（依存関係がないか、他のテーブルを参照しないもの）
+
+
+CREATE TABLE IF NOT EXISTS companies (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '会社ID',
+    company_name VARCHAR(100) NOT NULL COMMENT '会社名',
+    representative_name VARCHAR(100) NOT NULL COMMENT '代表者',
+    establishment_date DATE NOT NULL COMMENT '設立日',
+    postal_code VARCHAR(20) NOT NULL COMMENT '郵便番号',
+    address VARCHAR(255) NOT NULL COMMENT '住所',
+    business_details TEXT NOT NULL COMMENT '事業内容',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登録日',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日'
+);
+
+CREATE TABLE IF NOT EXISTS categories (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'カテゴリID',
+    name VARCHAR(50) NOT NULL UNIQUE COMMENT 'カテゴリ名',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登録日',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日'
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+
+-- 2. usersテーブル（rolesを参照）
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    furigana VARCHAR(50) NOT NULL,
+    postal_code VARCHAR(50) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    stripe_customer_id VARCHAR(255) NULL,   -- Stripeの顧客ID (null許容)
+    role_id INT NOT NULL, 
+    enabled BOOLEAN NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,    
+    FOREIGN KEY (role_id) REFERENCES roles (id)
+);
+
+---
+
+-- 3. verification_tokens と password_reset_tokens テーブル（usersを参照）
+
+CREATE TABLE IF NOT EXISTS verification_tokens (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    token VARCHAR(255) NOT NULL,        
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) 
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    expiry_date DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users (id) 
+);
+
+---
+
+-- 4. storesテーブル（categoriesを参照）
+
+CREATE TABLE IF NOT EXISTS stores (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '店舗ID',
+    category_id INT NOT NULL COMMENT 'FK: カテゴリID',
+    store_name VARCHAR(100) NOT NULL COMMENT '店名',
+    image_path VARCHAR(255) NOT NULL COMMENT '画像パス',
+    description TEXT NOT NULL COMMENT '説明',
+    price_min INT NOT NULL COMMENT '価格帯(下限)',
+    price_max INT NOT NULL COMMENT '価格帯(上限)',
+    opening_time TIME NOT NULL COMMENT '営業時間(開店)',
+    closing_time TIME NOT NULL COMMENT '営業時間(閉店)',
+    postal_code VARCHAR(20) NOT NULL COMMENT '郵便番号',
+    address VARCHAR(255) NOT NULL COMMENT '住所',
+    phone_number VARCHAR(50) NOT NULL COMMENT '電話番号',
+    regular_holiday VARCHAR(50) NOT NULL COMMENT '定休日',
+    capacity INT NOT NULL COMMENT '定員',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登録日',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日',
+    FOREIGN KEY (category_id) REFERENCES categories (id)
+);
+
+---
+
+-- 5. reservations と review テーブル（stores, users, membersを参照）
+
+CREATE TABLE IF NOT EXISTS reservations (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    store_id INT NOT NULL,
+    user_id INT NOT NULL,
+    reservation_date DATETIME NOT NULL,
+    number_of_people INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (store_id) REFERENCES stores (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'レビューID',
+    user_id INT NOT NULL COMMENT 'FK: 会員ID',
+    store_id INT NOT NULL COMMENT 'FK: 店舗ID',
+    star_rating TINYINT NOT NULL COMMENT '星の数 (1〜5など)',
+    comment TEXT COMMENT 'コメント',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登録日',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日',
+    UNIQUE (store_id, user_id),
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (store_id) REFERENCES stores (id)
+);
+
+CREATE TABLE IF NOT EXISTS favorites (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    store_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE (store_id, user_id),
+    FOREIGN KEY (store_id) REFERENCES stores (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
