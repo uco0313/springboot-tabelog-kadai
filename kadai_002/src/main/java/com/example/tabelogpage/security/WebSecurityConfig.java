@@ -37,7 +37,7 @@ public class WebSecurityConfig {
                 	).hasRole("PAID")
                 
                 // 管理者にのみアクセスを許可するURL
-                .requestMatchers("/admin/**", "/admin/stores/export/csv").hasRole("ADMIN")
+                .requestMatchers("/admin/**", "/admin/stores/export/csv","admin/company/edit").hasRole("ADMIN")
                 
                 // 上記以外のURLはログインが必要
                 .anyRequest().authenticated()

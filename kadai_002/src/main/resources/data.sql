@@ -349,7 +349,7 @@ INSERT IGNORE INTO roles (id, name) VALUES (3, 'ROLE_ADMIN');     -- 管理者
 
 -- ID 1: 佐藤 太郎 (ROLE_PAID)
 INSERT IGNORE INTO users (id, name, furigana, postal_code, address, phone_number, email, password, stripe_customer_id, role_id, enabled) 
-VALUES (1, '佐藤 太郎', 'サトウ タロウ', '460-0003', '愛知県名古屋市中区錦1-1-1', '090-1234-5678', 'taro.sato@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', NULL , 2, true);
+VALUES (1, '佐藤 太郎', 'サトウ タロウ', '460-0003', '愛知県名古屋市中区錦1-1-1', '090-1234-5678', 'taro.sato@example.com', '$2a$10$2JNjTwZBwo7fprL2X4sv.OEKqxnVtsVQvuXDkI8xVGix.U3W5B7CO', 'cus_TYLXzrKzlICgYe' , 2, true);
 
 -- ID 2: 鈴木 花子 (ROLE_FREE)
 INSERT IGNORE INTO users (id, name, furigana, postal_code, address, phone_number, email, password, stripe_customer_id, role_id, enabled) 
